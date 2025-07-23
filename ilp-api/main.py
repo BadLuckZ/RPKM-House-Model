@@ -96,7 +96,7 @@ async def solve_va(request: Request):
         for (gid, h) in x:
             if h in preference_index_cache[gid]:
                 rank_index = preference_index_cache[gid][h]
-                if rank_index + 1 in target_ranks:  # rank_index เริ่มจาก 0, เลยต้อง +1
+                if rank_index + 1 in target_ranks:
                     rank_vars.append(x[(gid, h)])
         return rank_vars
 
