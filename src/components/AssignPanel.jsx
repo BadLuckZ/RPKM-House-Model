@@ -34,6 +34,7 @@ function generateRandomGroups(numGroups, housesObj) {
   const groups = [];
   let nextMemberId = 30001;
 
+  // กำหนดน้ำหนักสำหรับจำนวนคนในกลุ่ม
   const numPeopleWeightsBox = [0.6, 0.2, 0.2];
   const numPeopleWeights = {
     1: numPeopleWeightsBox[0],
