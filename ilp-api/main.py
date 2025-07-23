@@ -102,50 +102,28 @@ async def solve_va(request: Request):
 
     # =============================================================================
     # LEXICOGRAPHIC OPTIMIZATION: แก้ปัญหาเป็น 3 stages
-    # Stage 1: Maximize อันดับ 1+2 รวมกัน
-    # Stage 2: Maximize อันดับ 1 (ภายใต้ constraint ของ stage 1)
+    # Stage 1: Maximize อันดับ 1 รวมกัน
+    # Stage 2: Maximize อันดับ 2 (ภายใต้ constraint ของ stage 1)
     # Stage 3: Maximize อันดับ 3+4+5 (ภายใต้ constraint ของ stage 1-2)
     # =============================================================================
     
     stage_constraints = []  # เก็บ constraints จาก stages ก่อนหน้า
     stage_results = {}      # เก็บผลลัพธ์แต่ละ stage
     
-    # STAGE 1: Maximize อันดับ 1+2 รวมกัน
-    rank_1_2_vars = get_rank_variables([1, 2])  # อันดับ 1 และ 2
-    
-    if rank_1_2_vars:
-        stage1_prob = LpProblem("LexicographicStage1", LpMaximize)
-        stage1_prob += lpSum(rank_1_2_vars), "MaximizeRank1and2"
-        add_basic_constraints(stage1_prob)
-        
-        solver = PULP_CBC_CMD(msg=0, timeLimit=TIME_LIMIT_A)
-        status = stage1_prob.solve(solver)
-        
-        if status == LpStatusOptimal:
-            optimal_rank_1_2 = value(stage1_prob.objective)
-            stage_results["rank_1_2"] = optimal_rank_1_2
-            
-            # Fix ผลลัพธ์ stage 1
-            if optimal_rank_1_2 > 0:
-                constraint = lpSum(rank_1_2_vars) == optimal_rank_1_2
-                stage_constraints.append(constraint)
+    solver = PULP_CBC_CMD(msg=0, timeLimit=TIME_LIMIT_A)
 
-    # STAGE 2: Maximize อันดับ 1 ภายใต้ constraint ของ stage 1
+    # STAGE 1: Maximize อันดับ 1 ภายใต้ constraint ของ stage 1
     rank_1_vars = get_rank_variables([1])  # เฉพาะอันดับ 1
     
-    if rank_1_vars and optimal_rank_1_2 > 0:
-        stage2_prob = LpProblem("LexicographicStage2", LpMaximize)
-        stage2_prob += lpSum(rank_1_vars), "MaximizeRank1"
-        add_basic_constraints(stage2_prob)
-        
-        # เพิ่ม constraints จาก stage 1
-        for constraint in stage_constraints:
-            stage2_prob += constraint
-        
-        status = stage2_prob.solve(solver)
-        
+    if rank_1_vars:
+        stage1_prob = LpProblem("LexicographicStage1", LpMaximize)
+        stage1_prob += lpSum(rank_1_vars), "MaximizeRank1"
+        add_basic_constraints(stage1_prob)
+
+        status = stage1_prob.solve(solver)
+
         if status == LpStatusOptimal:
-            optimal_rank_1 = value(stage2_prob.objective)
+            optimal_rank_1 = value(stage1_prob.objective)
             stage_results["rank_1"] = optimal_rank_1
             
             # Fix ผลลัพธ์ stage 2
@@ -153,6 +131,29 @@ async def solve_va(request: Request):
                 constraint = lpSum(rank_1_vars) == optimal_rank_1
                 stage_constraints.append(constraint)
 
+    # STAGE 2: Maximize อันดับ 2 
+    rank_2_vars = get_rank_variables([2])  # อันดับ 2
+    
+    if rank_2_vars and optimal_rank_1 > 0:
+        stage2_prob = LpProblem("LexicographicStage2", LpMaximize)
+        stage2_prob += lpSum(rank_2_vars), "MaximizeRank1and2"
+        add_basic_constraints(stage2_prob)
+
+        # เพิ่ม constraints จาก stage 1
+        for constraint in stage_constraints:
+            stage2_prob += constraint
+            
+        status = stage2_prob.solve(solver)
+
+        if status == LpStatusOptimal:
+            optimal_rank_2 = value(stage2_prob.objective)
+            stage_results["rank_2"] = optimal_rank_2
+            
+            # Fix ผลลัพธ์ stage 1
+            if optimal_rank_2 > 0:
+                constraint = lpSum(rank_2_vars) == optimal_rank_2
+                stage_constraints.append(constraint)
+                
     # STAGE 3: Maximize อันดับ 3+4+5 ภายใต้ constraint ของ stage 1-2
     rank_3_4_5_vars = get_rank_variables([3, 4, 5])
     

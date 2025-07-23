@@ -4,20 +4,12 @@ export const assignGroupsVa = async (groups, houses) => {
     if (Array.isArray(houses)) {
       housesData = {};
       houses.forEach((house) => {
-        housesData[house.id] = {
-          ...house,
-          min: Math.floor(0.7 * house.capacity),
-          max: house.capacity,
-        };
+        housesData[house.id] = house;
       });
     } else {
       housesData = {};
       Object.entries(houses).forEach(([id, house]) => {
-        housesData[id] = {
-          ...house,
-          min: Math.floor(0.7 * house.capacity),
-          max: house.capacity,
-        };
+        housesData[id] = house;
       });
     }
 
