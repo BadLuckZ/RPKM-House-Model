@@ -138,7 +138,7 @@ export const FIXED_HOUSES: HouseType[] = [
     id: "4cd5fea7-12b2-445e-90f6-debddaec428b",
     housename: "บ้านแจ๋ว",
     sizename: "L",
-    capacity: 357,
+    capacity: 360,
   },
 ].sort((a, b) => {
   const sizeA = SIZE_ORDER.indexOf(a.sizename);
