@@ -112,7 +112,7 @@ async def solve_va(request: Request):
     
     solver = PULP_CBC_CMD(msg=0, timeLimit=TIME_LIMIT_A)
 
-    # STAGE 1: Maximize อันดับ 1 ภายใต้ constraint ของ stage 1
+    # STAGE 1: Maximize อันดับ 1
     rank_1_vars = get_rank_variables([1])  # เฉพาะอันดับ 1
     
     if rank_1_vars:
@@ -131,12 +131,12 @@ async def solve_va(request: Request):
                 constraint = lpSum(rank_1_vars) == optimal_rank_1
                 stage_constraints.append(constraint)
 
-    # STAGE 2: Maximize อันดับ 2 
+    # STAGE 2: Maximize อันดับ 2 ภายใต้ constraint ของ stage 1
     rank_2_vars = get_rank_variables([2])  # อันดับ 2
     
     if rank_2_vars and optimal_rank_1 > 0:
         stage2_prob = LpProblem("LexicographicStage2", LpMaximize)
-        stage2_prob += lpSum(rank_2_vars), "MaximizeRank1and2"
+        stage2_prob += lpSum(rank_2_vars), "MaximizeRank2"
         add_basic_constraints(stage2_prob)
 
         # เพิ่ม constraints จาก stage 1
