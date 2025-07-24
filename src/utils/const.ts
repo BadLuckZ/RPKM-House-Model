@@ -72,7 +72,7 @@ export const FIXED_HOUSES: HouseType[] = [
     id: "fce68de6-369b-46d7-af17-f55f713bd586",
     housename: "บ้านคุณหนู",
     sizename: "S",
-    capacity: 123,
+    capacity: 140,
   },
   {
     id: "bb4aa16b-df63-435a-9ee4-c0c2f317c03f",
