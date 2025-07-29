@@ -3,7 +3,7 @@
 ## Setup
 1. Open your folder you want then clone this project
 ```sh
-git clone https://github.com/BadLuckZ/Study-ILP-Model.git
+git clone https://github.com/BadLuckZ/RPKM2025-House-Model
 ```
 
 2. Go inside this project, Open new terminal and install packages
